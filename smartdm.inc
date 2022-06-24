@@ -63,7 +63,7 @@ stock int Downloader_GetMaterialsFromMDL(const char[] model, char[][] files, int
 	return iRet;
 }
 
-static const char g_szModelExts[][16] = {".phy", ".sw.vtx", ".dx80.vtx", ".dx90.vtx", ".vtx", ".xbox.vtx", ".vvd"};
+static const char g_szModelExts[][16] = {".phy", ".sw.vtx", ".dx80.vtx", ".dx90.vtx", ".vtx", ".xbox.vtx", ".vvd", ".ani"};
 stock int Downloader_GetModelFiles(char[] model, char[][] files, int maxsize, int maxlen)
 {
 	char szRawPath[PLATFORM_MAX_PATH];
@@ -165,14 +165,14 @@ stock int Downloader_AddFileToDownloadsTable(ArrayList hCachedFiles, StringMap h
 	if (!hCachedFiles)
 	{
 		// hCachedFiles = CreateArray(PLATFORM_MAX_PATH);
-		LogError(": Invalid ArrayList handle!");
+		LogError("Downloader_AddFileToDownloadsTable: Invalid ArrayList handle!");
 		return 0;
 	}
 
 	if(!hCachedNums)
 	{
 		// hCachedNums = CreateTrie();
-		LogError(": Invalid StringMap handle!");
+		LogError("Downloader_AddFileToDownloadsTable: Invalid StringMap handle!");
 		return 0;
 	}
 
@@ -206,19 +206,24 @@ stock int Downloader_AddFileToDownloadsTable(ArrayList hCachedFiles, StringMap h
 	int iNum;
 	if(strcmp(szExt, ".mdl") == 0)
 	{
+		// LogError("Downloader_AddFileToDownloadsTable: Is mdl: %s!", filename);
+		
 		char szFiles[sizeof(g_szModelExts)][PLATFORM_MAX_PATH];
 		iNum = Downloader_GetModelFiles(filename, szFiles, sizeof(szFiles), sizeof(szFiles[]));
 		for(int i = 0; i < iNum; ++i)
 		{
-			iNumFiles += Downloader_AddFileToDownloadsTable(szFiles[i]) + 1;
+			// LogError("Downloader_GetModelFiles: %s!", szFiles[i]);
+			iNumFiles += Downloader_AddFileToDownloadsTable(hCachedFiles, hCachedNums, szFiles[i]) + 1;
 		}
 		
 		iNum = Downloader_GetMaterialsFromMDL(filename, szMaterials, sizeof(szMaterials), sizeof(szMaterials[]));
 		for(int i = 0; i < iNum; ++i)
 		{
+			// LogError("Downloader_GetModelFiles: %s!", szMaterials[i]);
 			if(FileExists(szMaterials[i]))
 			{
-				iNumFiles += Downloader_AddFileToDownloadsTable(szMaterials[i])+1;
+				// LogError("Downloader_GetModelFiles (Exist): %s!", szMaterials[i]);
+				iNumFiles += Downloader_AddFileToDownloadsTable(hCachedFiles, hCachedNums, szMaterials[i]) + 1;
 			}
 		}
 	}
@@ -231,7 +236,7 @@ stock int Downloader_AddFileToDownloadsTable(ArrayList hCachedFiles, StringMap h
 			Format(szMaterial, sizeof(szMaterial), "materials\\%s.vtf", szMaterials[i]);
 			if(FileExists(szMaterial))
 			{
-				iNumFiles += Downloader_AddFileToDownloadsTable(szMaterial)+1;
+				iNumFiles += Downloader_AddFileToDownloadsTable(hCachedFiles, hCachedNums, szMaterial)+1;
 			}
 		}
 	}
