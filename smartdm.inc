@@ -54,6 +54,7 @@ stock int Downloader_GetMaterialsFromMDL(const char[] model, char[][] files, int
 		
 		iPos = FilePosition(hFile);
 		ReadFileString(hFile, szFile, sizeof(szFile));
+		// LogError("MDL: %s - %s", szPath, szFile);
 		Format(files[iRet], maxlen, "materials\\%s%s.vmt", szPath, szFile);
 		FileSeek(hFile, iPos, SEEK_SET);
 	}
@@ -202,7 +203,7 @@ stock int Downloader_AddFileToDownloadsTable(ArrayList hCachedFiles, StringMap h
 	int iNumFiles = 0;
 
 	strcopy(szExt, sizeof(szExt), filename[iDot]);
-	char szMaterials[16][PLATFORM_MAX_PATH];
+	char szMaterials[32][PLATFORM_MAX_PATH];
 	int iNum;
 	if(strcmp(szExt, ".mdl") == 0)
 	{
